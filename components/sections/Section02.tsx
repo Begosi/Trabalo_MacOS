@@ -31,7 +31,9 @@ export function Section02() {
 
       // Desktop layout: Horizontal Pinning Scroll
       mm.add("(min-width: 769px)", () => {
-        const totalScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+        // Calculate scroll width against the visible parent window viewport
+        const parentWidth = scrollContainer.parentElement!.clientWidth;
+        const totalScroll = scrollContainer.scrollWidth - parentWidth;
         
         gsap.to(scrollContainer, {
           x: -totalScroll,
@@ -46,11 +48,11 @@ export function Section02() {
           }
         });
 
-        // Connect progress of the SVG line to the scroll scrub
-        gsap.fromTo(".timeline-line", 
-          { strokeDasharray: "1200", strokeDashoffset: "1200" },
+        // Connect progress of the horizontal bar to the scroll scrub
+        gsap.fromTo(".timeline-progress-bar", 
+          { width: "0%" },
           { 
-            strokeDashoffset: "0", 
+            width: "100%", 
             ease: "none",
             scrollTrigger: {
               trigger: section,
@@ -93,25 +95,24 @@ export function Section02() {
           
           {/* Timeline Wrapper (Desktop / Horizontal Mask) */}
           <div className="hidden md:block relative w-full overflow-hidden">
-            {/* SVG Connecting Line */}
-            <svg className="absolute top-[42px] left-0 w-full h-8 z-0" preserveAspectRatio="none">
-              <line x1="0" y1="16" x2="100%" y2="16" stroke="var(--mac-muted)" strokeWidth="2" strokeOpacity="0.2" />
-              <line className="timeline-line" x1="0" y1="16" x2="100%" y2="16" stroke="var(--mac-blue)" strokeWidth="4" />
-            </svg>
-
             {/* Horizontal Container */}
             <div 
               ref={containerRef} 
               className="timeline-scroll-container flex flex-nowrap gap-12 px-10 relative z-10 py-6"
               style={{ width: "fit-content" }}
             >
+              {/* Sliding Connecting Line (Placed inside to slide with elements) */}
+              <div className="absolute top-[24px] left-[50px] right-[50px] h-[3px] bg-white/10 z-0">
+                <div className="timeline-progress-bar h-full bg-[var(--mac-blue)] w-0 rounded-full shadow-[0_0_12px_rgba(0,113,227,0.8)]" />
+              </div>
+
               {milestones.map((item, idx) => (
-                <div key={idx} className="timeline-item w-[300px] shrink-0 flex flex-col items-start group">
+                <div key={idx} className="timeline-item w-[300px] shrink-0 flex flex-col items-start group relative">
                   {/* Glowing Node */}
-                  <div className="w-5 h-5 rounded-full bg-[var(--mac-surface)] border-4 border-[var(--mac-blue)] shadow-[0_0_10px_rgba(0,113,227,0.5)] z-10 mb-6 group-hover:scale-130 group-hover:bg-[var(--mac-blue)] transition-all" />
+                  <div className="w-5 h-5 rounded-full bg-[var(--mac-surface)] border-4 border-[var(--mac-blue)] shadow-[0_0_10px_rgba(0,113,227,0.5)] z-10 mb-6 group-hover:scale-130 group-hover:bg-[var(--mac-blue)] transition-all cursor-default" />
                   
                   {/* Card Content */}
-                  <div className="milestone-card bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-sm hover:bg-white/10 hover:border-white/20 transition-all duration-300 w-full">
+                  <div className="milestone-card bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-sm hover:bg-white/10 hover:border-white/20 transition-all duration-300 w-full shadow-md">
                     <span className="text-[var(--mac-blue)] font-extrabold text-2xl tracking-tight block mb-2">{item.year}</span>
                     <h3 className="text-md font-bold mb-2 text-white">{item.title}</h3>
                     <p className="text-[var(--mac-muted)] text-xs leading-relaxed">{item.desc}</p>
