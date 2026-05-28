@@ -29,22 +29,24 @@ export function Section02() {
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
 
-      // Desktop layout: Horizontal Pinning Scroll
+      // Desktop layout: Horizontal Pinning Scroll with dynamic calculations
       mm.add("(min-width: 769px)", () => {
-        // Calculate scroll width against the visible parent window viewport
-        const parentWidth = scrollContainer.parentElement!.clientWidth;
-        const totalScroll = scrollContainer.scrollWidth - parentWidth;
+        const getScrollAmount = () => {
+          const parentWidth = scrollContainer.parentElement?.clientWidth || 0;
+          return Math.max(0, scrollContainer.scrollWidth - parentWidth);
+        };
         
         gsap.to(scrollContainer, {
-          x: -totalScroll,
+          x: () => -getScrollAmount(),
           ease: "none",
           scrollTrigger: {
             trigger: section,
             pin: true,
-            scrub: 1.2,
+            scrub: 0.8,
             start: "center center",
-            end: () => `+=${totalScroll}`,
+            end: () => `+=${getScrollAmount()}`,
             invalidateOnRefresh: true,
+            anticipatePin: 1,
           }
         });
 
@@ -56,9 +58,10 @@ export function Section02() {
             ease: "none",
             scrollTrigger: {
               trigger: section,
-              scrub: 1.2,
+              scrub: 0.8,
               start: "center center",
-              end: () => `+=${totalScroll}`,
+              end: () => `+=${getScrollAmount()}`,
+              invalidateOnRefresh: true,
             }
           }
         );
