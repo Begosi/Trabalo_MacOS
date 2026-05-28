@@ -9,6 +9,18 @@ export function useScrollAnimation(containerRef: React.RefObject<HTMLElement | n
     gsap.registerPlugin(ScrollTrigger);
 
     const ctx = gsap.context(() => {
+      // Check if mobile (width <= 768px)
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        selectors.forEach((selector) => {
+          const elements = gsap.utils.toArray(selector);
+          elements.forEach((el) => {
+            gsap.set(el as gsap.DOMTarget, { opacity: 1, y: 0, scale: 1 });
+          });
+        });
+        return;
+      }
+
       // Check for reduced motion preference
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (prefersReducedMotion) {

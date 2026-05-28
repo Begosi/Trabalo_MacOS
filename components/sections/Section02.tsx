@@ -70,23 +70,10 @@ export function Section02() {
         );
       });
 
-      // Mobile layout: Vertical Stagger Reveal
+      // Mobile layout: Instant display to guarantee text and cards are visible on iPhones
       mm.add("(max-width: 768px)", () => {
         const items = scrollContainer.querySelectorAll(".timeline-item");
-        gsap.fromTo(items,
-          { opacity: 0, y: 40 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            stagger: 0.15,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: scrollContainer,
-              start: "top 80%",
-            }
-          }
-        );
+        gsap.set(items, { opacity: 1, y: 0 });
       });
 
     }, containerRef);

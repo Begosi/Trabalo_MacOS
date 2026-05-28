@@ -10,71 +10,98 @@ export function Section06() {
   useScrollAnimation(ref, [".resource-card"]);
 
   useEffect(() => {
+    if (!ref.current) return;
     gsap.registerPlugin(ScrollTrigger);
 
-    if (ref.current) {
-      // Counter animation
-      const counters = ref.current.querySelectorAll(".counter-value");
-      
-      counters.forEach((counter) => {
-        const targetValue = parseInt(counter.getAttribute("data-target") || "0", 10);
-        
+    const counters = ref.current.querySelectorAll(".counter-value");
+    const progressBarsHoriz = ref.current.querySelectorAll(".progress-fill-horizontal");
+    const progressBarsVert = ref.current.querySelectorAll(".progress-fill-vertical");
+
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+
+      mm.add("(min-width: 769px)", () => {
+        // Counter animation
+        counters.forEach((counter) => {
+          const targetValue = parseInt(counter.getAttribute("data-target") || "0", 10);
+          
+          ScrollTrigger.create({
+            trigger: ref.current,
+            start: "top 75%",
+            onEnter: () => {
+              gsap.fromTo(counter, 
+                { innerHTML: 0 }, 
+                {
+                  innerHTML: targetValue,
+                  duration: 2,
+                  ease: "power2.out",
+                  snap: { innerHTML: 1 },
+                  onUpdate: function() {
+                    counter.innerHTML = Math.round(this.targets()[0].innerHTML).toString() + (counter.getAttribute("data-suffix") || "");
+                  }
+                }
+              );
+            }
+          });
+        });
+
+        // Progress bars (horizontal width)
         ScrollTrigger.create({
           trigger: ref.current,
           start: "top 75%",
           onEnter: () => {
-            gsap.fromTo(counter, 
-              { innerHTML: 0 }, 
+            gsap.fromTo(progressBarsHoriz,
+              { width: "0%" },
               {
-                innerHTML: targetValue,
-                duration: 2,
-                ease: "power2.out",
-                snap: { innerHTML: 1 },
-                onUpdate: function() {
-                  counter.innerHTML = Math.round(this.targets()[0].innerHTML).toString() + (counter.getAttribute("data-suffix") || "");
-                }
+                width: (i, target) => target.getAttribute("data-width") || "0%",
+                duration: 1.5,
+                ease: "power3.out",
+                stagger: 0.2
+              }
+            );
+          }
+        });
+
+        // Progress bars (vertical height in CPU chart)
+        ScrollTrigger.create({
+          trigger: ref.current,
+          start: "top 75%",
+          onEnter: () => {
+            gsap.fromTo(progressBarsVert,
+              { height: "0%" },
+              {
+                height: (i, target) => target.getAttribute("data-height") || "0%",
+                duration: 1.5,
+                ease: "power3.out",
+                stagger: 0.2
               }
             );
           }
         });
       });
 
-      // Progress bars (horizontal width)
-      const progressBarsHoriz = ref.current.querySelectorAll(".progress-fill-horizontal");
-      ScrollTrigger.create({
-        trigger: ref.current,
-        start: "top 75%",
-        onEnter: () => {
-          gsap.fromTo(progressBarsHoriz,
-            { width: "0%" },
-            {
-              width: (i, target) => target.getAttribute("data-width") || "0%",
-              duration: 1.5,
-              ease: "power3.out",
-              stagger: 0.2
-            }
-          );
-        }
+      mm.add("(max-width: 768px)", () => {
+        // Instant visual presentation on mobile (iPhones)
+        counters.forEach((counter) => {
+          const targetValue = counter.getAttribute("data-target") || "0";
+          const suffix = counter.getAttribute("data-suffix") || "";
+          counter.innerHTML = targetValue + suffix;
+        });
+
+        progressBarsHoriz.forEach((bar) => {
+          const targetWidth = bar.getAttribute("data-width") || "0%";
+          gsap.set(bar, { width: targetWidth });
+        });
+
+        progressBarsVert.forEach((bar) => {
+          const targetHeight = bar.getAttribute("data-height") || "0%";
+          gsap.set(bar, { height: targetHeight });
+        });
       });
 
-      // Progress bars (vertical height in CPU chart)
-      const progressBarsVert = ref.current.querySelectorAll(".progress-fill-vertical");
-      ScrollTrigger.create({
-        trigger: ref.current,
-        start: "top 75%",
-        onEnter: () => {
-          gsap.fromTo(progressBarsVert,
-            { height: "0%" },
-            {
-              height: (i, target) => target.getAttribute("data-height") || "0%",
-              duration: 1.5,
-              ease: "power3.out",
-              stagger: 0.2
-            }
-          );
-        }
-      });
-    }
+    }, ref);
+
+    return () => ctx.revert();
   }, []);
 
   return (

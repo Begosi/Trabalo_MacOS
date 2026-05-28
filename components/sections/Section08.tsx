@@ -11,28 +11,42 @@ export function Section08() {
   useScrollAnimation(ref, [".panel-container"]);
 
   useEffect(() => {
+    if (!ref.current) return;
     gsap.registerPlugin(ScrollTrigger);
 
-    if (ref.current) {
-      const proItems = ref.current.querySelectorAll(".pro-item");
-      const conItems = ref.current.querySelectorAll(".con-item");
-      
-      // Alternate left/right entry
-      ScrollTrigger.create({
-        trigger: ref.current,
-        start: "top 70%",
-        onEnter: () => {
-          gsap.fromTo(proItems, 
-            { x: -50, opacity: 0 }, 
-            { x: 0, opacity: 1, duration: 0.6, stagger: 0.15, ease: "power2.out" }
-          );
-          gsap.fromTo(conItems, 
-            { x: 50, opacity: 0 }, 
-            { x: 0, opacity: 1, duration: 0.6, stagger: 0.15, ease: "power2.out", delay: 0.1 }
-          );
-        }
+    const proItems = ref.current.querySelectorAll(".pro-item");
+    const conItems = ref.current.querySelectorAll(".con-item");
+
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+
+      mm.add("(min-width: 769px)", () => {
+        // Alternate left/right entry
+        ScrollTrigger.create({
+          trigger: ref.current,
+          start: "top 70%",
+          onEnter: () => {
+            gsap.fromTo(proItems, 
+              { x: -50, opacity: 0 }, 
+              { x: 0, opacity: 1, duration: 0.6, stagger: 0.15, ease: "power2.out" }
+            );
+            gsap.fromTo(conItems, 
+              { x: 50, opacity: 0 }, 
+              { x: 0, opacity: 1, duration: 0.6, stagger: 0.15, ease: "power2.out", delay: 0.1 }
+            );
+          }
+        });
       });
-    }
+
+      mm.add("(max-width: 768px)", () => {
+        // Instant visual presentation on mobile (iPhones)
+        gsap.set(proItems, { x: 0, opacity: 1 });
+        gsap.set(conItems, { x: 0, opacity: 1 });
+      });
+
+    }, ref);
+
+    return () => ctx.revert();
   }, []);
 
   return (

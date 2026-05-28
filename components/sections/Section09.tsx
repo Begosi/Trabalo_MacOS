@@ -10,31 +10,46 @@ export function Section09() {
   useScrollAnimation(ref, [".licensing-card"]);
 
   useEffect(() => {
+    if (!ref.current) return;
     gsap.registerPlugin(ScrollTrigger);
 
-    if (ref.current) {
-      // Circular SVG fill animation
-      const circles = ref.current.querySelectorAll(".circle-fill");
-      
-      ScrollTrigger.create({
-        trigger: ref.current,
-        start: "top 75%",
-        onEnter: () => {
-          gsap.fromTo(circles,
-            { strokeDashoffset: 283 }, // 2 * PI * r (r=45) = 282.7
-            {
-              strokeDashoffset: (i, target) => {
-                const percent = parseInt(target.getAttribute("data-percent") || "0");
-                return 283 - (283 * percent) / 100;
-              },
-              duration: 2,
-              ease: "power3.out",
-              stagger: 0.3
-            }
-          );
-        }
+    const circles = ref.current.querySelectorAll(".circle-fill");
+
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+
+      mm.add("(min-width: 769px)", () => {
+        ScrollTrigger.create({
+          trigger: ref.current,
+          start: "top 75%",
+          onEnter: () => {
+            gsap.fromTo(circles,
+              { strokeDashoffset: 283 }, // 2 * PI * r (r=45) = 282.7
+              {
+                strokeDashoffset: (i, target) => {
+                  const percent = parseInt(target.getAttribute("data-percent") || "0");
+                  return 283 - (283 * percent) / 100;
+                },
+                duration: 2,
+                ease: "power3.out",
+                stagger: 0.3
+              }
+            );
+          }
+        });
       });
-    }
+
+      mm.add("(max-width: 768px)", () => {
+        // Instant visual presentation on mobile (iPhones)
+        circles.forEach((circle) => {
+          const percent = parseInt(circle.getAttribute("data-percent") || "0", 10);
+          gsap.set(circle, { strokeDashoffset: 283 - (283 * percent) / 100 });
+        });
+      });
+
+    }, ref);
+
+    return () => ctx.revert();
   }, []);
 
   return (

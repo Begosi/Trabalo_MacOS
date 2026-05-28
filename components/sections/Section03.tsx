@@ -58,25 +58,34 @@ export function Section03() {
   ];
 
   useEffect(() => {
+    if (!ref.current) return;
     gsap.registerPlugin(ScrollTrigger);
     
-    if (ref.current) {
-      const layers = ref.current.querySelectorAll(".arch-layer");
+    const layers = ref.current.querySelectorAll(".arch-layer");
+    
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
       
-      gsap.fromTo(layers, 
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1, 
-          y: 0, 
-          duration: 0.8,
-          stagger: -0.2, // Animate from bottom to top visually
-          ease: "back.out(1.2)",
-          scrollTrigger: {
-            trigger: ref.current,
-            start: "top 70%",
+      mm.add("(min-width: 769px)", () => {
+        gsap.fromTo(layers, 
+          { opacity: 0, y: 50 },
+          {
+            opacity: 1, 
+            y: 0, 
+            duration: 0.8,
+            stagger: -0.2, // Animate from bottom to top visually
+            ease: "back.out(1.2)",
+            scrollTrigger: {
+              trigger: ref.current,
+              start: "top 70%",
+            }
           }
-        }
-      );
+        );
+      });
+
+      mm.add("(max-width: 768px)", () => {
+        gsap.set(layers, { opacity: 1, y: 0 });
+      });
 
       // Pulse animation for Hybrid Kernel badge
       gsap.to(".kernel-badge", {
@@ -87,7 +96,9 @@ export function Section03() {
         yoyo: true,
         ease: "sine.inOut"
       });
-    }
+    }, ref);
+
+    return () => ctx.revert();
   }, []);
 
   return (

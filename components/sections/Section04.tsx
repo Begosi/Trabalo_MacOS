@@ -42,50 +42,66 @@ export function Section04() {
   };
 
   useEffect(() => {
+    if (!ref.current) return;
     gsap.registerPlugin(ScrollTrigger);
 
-    if (ref.current) {
-      // 3D Flip effect on scroll
-      gsap.fromTo(".split-screen-container",
-        { rotationY: -15, scale: 0.9, opacity: 0 },
-        {
-          rotationY: 0,
-          scale: 1,
-          opacity: 1,
-          duration: 1,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: ref.current,
-            start: "top 80%",
-          }
-        }
-      );
+    const terminalText = ref.current.querySelector(".terminal-text") as HTMLElement;
+    const text = "uname -a\nDarwin MacBook-Pro.local 23.0.0 Darwin Kernel Version 23.0.0: root:xnu-10002.1.13~1/RELEASE_ARM64_T8103 arm64\n$ sw_vers\nProductName: macOS\nProductVersion: 14.0\nBuildVersion: 23A344\n$ _";
 
-      // Typewriter effect for terminal
-      const text = "uname -a\nDarwin MacBook-Pro.local 23.0.0 Darwin Kernel Version 23.0.0: root:xnu-10002.1.13~1/RELEASE_ARM64_T8103 arm64\n$ sw_vers\nProductName: macOS\nProductVersion: 14.0\nBuildVersion: 23A344\n$ _";
-      const terminalText = ref.current.querySelector(".terminal-text");
-      
-      if (terminalText) {
-        terminalText.textContent = "";
-        const charArray = text.split("");
-        let currentText = "";
-        
-        ScrollTrigger.create({
-          trigger: ref.current,
-          start: "top 60%",
-          onEnter: () => {
-            if (terminalText.textContent === "") {
-              charArray.forEach((char, index) => {
-                setTimeout(() => {
-                  currentText += char;
-                  terminalText.textContent = currentText;
-                }, index * 20); // 20ms per character
-              });
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+
+      mm.add("(min-width: 769px)", () => {
+        // 3D Flip effect on scroll
+        gsap.fromTo(".split-screen-container",
+          { rotationY: -15, scale: 0.9, opacity: 0 },
+          {
+            rotationY: 0,
+            scale: 1,
+            opacity: 1,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: ref.current,
+              start: "top 80%",
             }
           }
-        });
-      }
-    }
+        );
+
+        // Typewriter effect for terminal
+        if (terminalText) {
+          terminalText.textContent = "";
+          const charArray = text.split("");
+          let currentText = "";
+          
+          ScrollTrigger.create({
+            trigger: ref.current,
+            start: "top 60%",
+            onEnter: () => {
+              if (terminalText.textContent === "") {
+                charArray.forEach((char, index) => {
+                  setTimeout(() => {
+                    currentText += char;
+                    terminalText.textContent = currentText;
+                  }, index * 20); // 20ms per character
+                });
+              }
+            }
+          });
+        }
+      });
+
+      mm.add("(max-width: 768px)", () => {
+        // Force full display instantly on mobile
+        gsap.set(".split-screen-container", { rotationY: 0, scale: 1, opacity: 1 });
+        if (terminalText) {
+          terminalText.textContent = text;
+        }
+      });
+
+    }, ref);
+
+    return () => ctx.revert();
   }, []);
 
   return (
