@@ -1,0 +1,148 @@
+"use client";
+import React, { useRef, useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import { MacWindow } from "@/components/MacWindow";
+
+export function Section02() {
+  const ref = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  useScrollAnimation(ref, [".milestone-card"]);
+
+  const milestones = [
+    { year: "1984", title: "Mac OS (Classic)", desc: "Apresentado com o primeiro Macintosh, revolucionando as GUIs com menus suspensos, lixeira e pastas de arquivos." },
+    { year: "2001", title: "Mac OS X Cheetah", desc: "Reescrito do zero. Baseado no NeXTSTEP e núcleo Unix (Darwin), introduzindo a moderna interface Aqua e super estabilidade." },
+    { year: "2013", title: "OS X Mavericks", desc: "Fim da nomenclatura baseada em felinos e início das regiões icônicas da Califórnia. Otimizações de consumo e RAM comprimida." },
+    { year: "2020", title: "macOS Big Sur", desc: "Transição histórica para chips de fabricação própria (Apple Silicon) e redesenho profundo da interface inspirado no iOS." },
+    { year: "2024", title: "macOS Sequoia", desc: "Integração profunda com a inteligência artificial generativa nativa (Apple Intelligence) e espelhamento de iPhone." },
+  ];
+
+  useEffect(() => {
+    if (!containerRef.current || !ref.current) return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    const scrollContainer = containerRef.current;
+    const section = ref.current;
+    
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+
+      // Desktop layout: Horizontal Pinning Scroll
+      mm.add("(min-width: 769px)", () => {
+        const totalScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+        
+        gsap.to(scrollContainer, {
+          x: -totalScroll,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            pin: true,
+            scrub: 1.2,
+            start: "center center",
+            end: () => `+=${totalScroll}`,
+            invalidateOnRefresh: true,
+          }
+        });
+
+        // Connect progress of the SVG line to the scroll scrub
+        gsap.fromTo(".timeline-line", 
+          { strokeDasharray: "1200", strokeDashoffset: "1200" },
+          { 
+            strokeDashoffset: "0", 
+            ease: "none",
+            scrollTrigger: {
+              trigger: section,
+              scrub: 1.2,
+              start: "center center",
+              end: () => `+=${totalScroll}`,
+            }
+          }
+        );
+      });
+
+      // Mobile layout: Vertical Stagger Reveal
+      mm.add("(max-width: 768px)", () => {
+        const items = scrollContainer.querySelectorAll(".timeline-item");
+        gsap.fromTo(items,
+          { opacity: 0, y: 40 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            stagger: 0.15,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: scrollContainer,
+              start: "top 80%",
+            }
+          }
+        );
+      });
+
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section id="section-02" ref={ref} className="scroll-mt-20">
+      <MacWindow title="História_e_Evolução.app">
+        <div className="py-6 overflow-hidden w-full relative min-h-[380px]">
+          
+          {/* Timeline Wrapper (Desktop / Horizontal Mask) */}
+          <div className="hidden md:block relative w-full overflow-hidden">
+            {/* SVG Connecting Line */}
+            <svg className="absolute top-[42px] left-0 w-full h-8 z-0" preserveAspectRatio="none">
+              <line x1="0" y1="16" x2="100%" y2="16" stroke="var(--mac-muted)" strokeWidth="2" strokeOpacity="0.2" />
+              <line className="timeline-line" x1="0" y1="16" x2="100%" y2="16" stroke="var(--mac-blue)" strokeWidth="4" />
+            </svg>
+
+            {/* Horizontal Container */}
+            <div 
+              ref={containerRef} 
+              className="timeline-scroll-container flex flex-nowrap gap-12 px-10 relative z-10 py-6"
+              style={{ width: "fit-content" }}
+            >
+              {milestones.map((item, idx) => (
+                <div key={idx} className="timeline-item w-[300px] shrink-0 flex flex-col items-start group">
+                  {/* Glowing Node */}
+                  <div className="w-5 h-5 rounded-full bg-[var(--mac-surface)] border-4 border-[var(--mac-blue)] shadow-[0_0_10px_rgba(0,113,227,0.5)] z-10 mb-6 group-hover:scale-130 group-hover:bg-[var(--mac-blue)] transition-all" />
+                  
+                  {/* Card Content */}
+                  <div className="milestone-card bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-sm hover:bg-white/10 hover:border-white/20 transition-all duration-300 w-full">
+                    <span className="text-[var(--mac-blue)] font-extrabold text-2xl tracking-tight block mb-2">{item.year}</span>
+                    <h3 className="text-md font-bold mb-2 text-white">{item.title}</h3>
+                    <p className="text-[var(--mac-muted)] text-xs leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Mobile Layout (Vertical Timeline) */}
+          <div className="md:hidden relative px-4 py-2 flex flex-col gap-8">
+            {/* Vertical Line on Left */}
+            <div className="absolute left-6 top-4 bottom-4 w-0.5 bg-gradient-to-b from-[var(--mac-blue)] to-[var(--mac-muted)] opacity-30 z-0" />
+            
+            {milestones.map((item, idx) => (
+              <div key={idx} className="timeline-item flex items-start gap-4 relative z-10">
+                {/* Node */}
+                <div className="w-4 h-4 rounded-full bg-[var(--mac-surface)] border-4 border-[var(--mac-blue)] shrink-0 mt-2 z-10" />
+                
+                {/* Card */}
+                <div className="milestone-card flex-1 bg-white/5 border border-white/10 p-5 rounded-2xl">
+                  <span className="text-[var(--mac-blue)] font-bold text-lg block mb-1">{item.year}</span>
+                  <h3 className="text-sm font-bold mb-1 text-white">{item.title}</h3>
+                  <p className="text-[var(--mac-muted)] text-xs leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </MacWindow>
+    </section>
+  );
+}
