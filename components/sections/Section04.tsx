@@ -106,7 +106,7 @@ export function Section04() {
               <div className="bg-white/10 p-2 text-center text-[10px] text-[var(--mac-muted)] font-bold uppercase tracking-widest border-b border-white/5 group-hover:bg-white/20 transition-colors">
                 Finder (Aqua GUI) &bull; Clique para inspecionar
               </div>
-              <div className="p-6 flex-1 grid grid-cols-3 gap-4 place-items-start">
+              <div className="p-4 sm:p-6 flex-1 grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 place-items-start">
                 <div className="flex flex-col items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors w-full">
                   <Folder className="text-blue-400 w-10 h-10" fill="currentColor" fillOpacity={0.2} />
                   <span className="text-xs text-[var(--mac-text)]">Documentos</span>
@@ -134,7 +134,7 @@ export function Section04() {
               <div className="bg-white/10 p-2 text-center text-[10px] text-[var(--mac-muted)] font-bold border-b border-white/5 group-hover:bg-white/20 transition-colors">
                 Terminal — zsh &bull; Clique para inspecionar
               </div>
-              <div className="p-4 flex-1 text-green-400 text-sm whitespace-pre-wrap relative min-h-[140px]">
+              <div className="p-4 flex-1 text-green-400 text-xs sm:text-sm whitespace-pre-wrap relative min-h-[140px]">
                 <span className="terminal-text"></span>
                 <span className="animate-pulse">█</span>
               </div>

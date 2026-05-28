@@ -116,9 +116,9 @@ export function Section09() {
 
           </div>
 
-          <div className="mt-8 flex justify-center gap-4">
-            <span className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-xs font-medium">Darwin Open Source</span>
-            <span className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-xs font-medium">GUI Proprietária</span>
+          <div className="mt-8 flex flex-wrap justify-center gap-2 sm:gap-4">
+            <span className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-white/5 border border-white/10 text-[11px] sm:text-xs font-medium text-center">Darwin Open Source</span>
+            <span className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-white/5 border border-white/10 text-[11px] sm:text-xs font-medium text-center">GUI Proprietária</span>
           </div>
         </div>
       </MacWindow>

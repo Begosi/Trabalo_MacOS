@@ -30,7 +30,7 @@ export function MacWindow({ title, children, className }: MacWindowProps) {
         </div>
       </div>
       {/* Content */}
-      <div className="p-6 relative z-0 text-[var(--mac-text)]">
+      <div className="p-4 sm:p-6 relative z-0 text-[var(--mac-text)]">
         {children}
       </div>
     </div>
