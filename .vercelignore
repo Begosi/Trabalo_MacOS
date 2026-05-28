@@ -1,7 +1,0 @@
-node_modules
-.git
-.vscode
-.DS_Store
-.idea
-*.log
-*.png (if you keep large assets locally – optional)
